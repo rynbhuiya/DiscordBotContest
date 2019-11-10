@@ -9,9 +9,8 @@ class MyClient(discord.Client):
         # don't respond to ourselves
         if message.author == self.user:
             return
-
-        if message.content == 'Hello':
-            await message.channel.send('Hello Hello')
+        if message.content == 'HOWDY':
+            await message.channel.send('H A W Y E E')
 
 
 client = MyClient()
