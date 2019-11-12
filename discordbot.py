@@ -33,11 +33,15 @@ async def on_message(message):
                 on[0] = True
                 tic = discord.Embed(title="{} vs. {}".format(
                     str(userID[0])+"  :x:", str(userID[1])+"  :o:"), colour=discord.Colour.red())
-
+                on_message.board = [":one:", ":two:", ":three:", ":four:",
+                                    ":five:", ":six:", ":seven:", ":eight:", ":nine:"]
                 on_message.emarr = [[], [], []]
-                for i in range(3):
-                    for j in range(3):
-                        on_message.emarr[i].append(":white_large_square:")
+                b = 0
+                while b < 9:
+                    for i in range(3):
+                        for j in range(3):
+                            on_message.emarr[i].append(on_message.board[b])
+                            b += 1
 
                 val = ""
                 for i in range(3):
@@ -57,6 +61,8 @@ async def on_message(message):
 
 @client.event
 async def on_reaction_add(reaction, user):
+    if on_message.em.id != reaction.message.id:
+        return
     count = 0
     if user == client.user:
         return
@@ -83,7 +89,7 @@ async def on_reaction_add(reaction, user):
                         temp = on_message.emarr[int((m-1)/3-1)][int(m % 3+1)]
                     else:
                         temp = on_message.emarr[int((m-1)/3)][(int(m-1) % 3)-1]
-                    if temp != ":white_large_square:":
+                    if (temp not in on_message.board):
                         on_reaction_add.j -= 1
                         return
                     else:
