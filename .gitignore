@@ -5,4 +5,4 @@ testbot.py
 cogs/rpscog.py
 cogs/__pycache__/rpscog.cpython-38.pyc
 cogs/__pycache__/example.cpython-38.pyc
-.vscode/settings.json
+.vscode/
