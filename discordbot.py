@@ -9,7 +9,7 @@ import discord.colour
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
-client = commands.Bot(command_prefix="/")
+client = commands.Bot(command_prefix=".")
 
 
 @client.event
@@ -25,7 +25,7 @@ on = [False]
 async def on_message(message):
     if message.author == client.user:
         return
-    if message.content.startswith("/TTT"):
+    if message.content.startswith(".ttt"):
         if len(userID) < 2:
             userID.append(message.author.name)
         if len(userID) == 2:
