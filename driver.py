@@ -92,182 +92,87 @@ on_reaction_add_ng.reaction_counter = 0    #number of reactions for this number
 
 ############################RPSRPSRPSRPSRPSRPSRPS#####################
 rlist = []
-
 rlist.append(None)
-
 rlist.append(None)
-
-
-
 
 async def on_message_rps(message):
-
     if (message.content[0:4] == '.rps'):
-
-
-
         if on_message_rps.gamestatus == True:
-
             await message.channel.send('Game in Progress')
-
             return
-
         if len(message.mentions) != 1:
-
-            return 
-
-
-
+            return
         if message.mentions[0].bot == True:
-
             return 
-
-        
 
         on_reaction_add_rps.ulist.append(message.mentions[0])
-
         on_reaction_add_rps.ulist.append(message.author)
 
-
-
         # on_reaction_add_rps.ulist[0] = message.mentions[0]
-
         # on_reaction_add_rps.ulist[1] = message.author
 
-
-
         embed = discord.Embed()
-
         embed.add_field(name = 'Rock, Paper, Scissors!\n'+ on_reaction_add_rps.ulist[0].name + ' vs. ' + on_reaction_add_rps.ulist[1].name, value ='Enter on Go!')
-
         on_message_rps.m = await message.channel.send(embed = embed)
-
         await on_message_rps.m.add_reaction('✂')
-
         await on_message_rps.m.add_reaction('📰')
-
         await on_message_rps.m.add_reaction('⛰')
 
         
-
         await asyncio.sleep(0.5)
-
-
-
         for i in range(3):
-
             await asyncio.sleep(1)
-
             embed = discord.Embed()
-
             embed.add_field(name = 'Rock, Paper, Scissors!\n'+ on_reaction_add_rps.ulist[0].name + ' vs. ' + on_reaction_add_rps.ulist[1].name, value = str(3 - i))
-
-
-
             await on_message_rps.m.edit(embed = embed)
 
-        
-
         await asyncio.sleep(1)
-
         embed = discord.Embed()
-
         embed.add_field(name = 'Rock, Paper, Scissors!\n'+ on_reaction_add_rps.ulist[0].name + ' vs. ' + on_reaction_add_rps.ulist[1].name, value = 'Go!')
 
-
-
         await on_message_rps.m.edit(embed = embed)
-
-
-
         on_message_rps.gamestatus = True
-
         await asyncio.sleep(5)
 
-
-
         if rlist[0] == None and rlist[1] == None and on_message_rps.gamestatus == True:
-
             await message.channel.send('Neither players gave an input') 
-
             rlist[0] = None
-
             rlist[1] = None
 
             on_reaction_add_rps.ulist = []
-
             on_message_rps.gamestatus = False
-
             on_reaction_add_rps.check = False
-
             on_reaction_add_rps.react = False
-
             on_reaction_add_rps.timer = False
-
-
 
 on_message_rps.gamestatus = False
 
-
-
-
-
-
-
-
-
 async def on_reaction_add_rps(reaction, user):
-
     if on_message_rps.m.id != reaction.message.id:
-
         return
-
     if on_message_rps.gamestatus == False:
-
         return
-
     if user == client.user:
-
         return
-
-
 
     if on_reaction_add_rps.ulist[0] == user:
-
         rlist[0] = reaction.emoji
-
     elif on_reaction_add_rps.ulist[1] == user:
-
         rlist[1] = reaction.emoji
 
-        
-
     #rlist.append(reaction.emoji)
-
     await asyncio.sleep(2)
 
-    
-
     on_reaction_add_rps.timer = True
-
     if (on_reaction_add_rps.react == False):
-
         on_reaction_add_rps.react = True
 
-        
-
         if rlist[0] == None:
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[0].name + ' did not input on time')
-
         elif rlist[1] == None:
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[1].name + ' did not input on time')
-
         else:
-
             await reaction.message.channel.send(str(rlist[0]) + ' : ' + str(rlist[1]))
-
             on_reaction_add_rps.check = True
 
 
@@ -279,63 +184,34 @@ async def on_reaction_add_rps(reaction, user):
     # Check for win condition
 
     if on_reaction_add_rps.check:
-
         if rlist[0] == rlist[1]:
-
             await reaction.message.channel.send('Tie!')
-
         elif (str(rlist[0]) == '✂' and str(rlist[1]) == '📰'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[0].name + ' has won!')
-
         elif (str(rlist[0]) == '📰' and str(rlist[1]) == '⛰'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[0].name + ' has won!')
-
         elif (str(rlist[0]) == '⛰' and str(rlist[1]) == '✂'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[0].name + ' has won!')
-
-        
-
         elif (str(rlist[1]) == '✂' and str(rlist[0]) == '📰'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[1].name + ' has won!')
-
         elif (str(rlist[1]) == '📰' and str(rlist[0]) == '⛰'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[1].name + ' has won!')
-
         elif (str(rlist[1]) == '⛰' and str(rlist[0]) == '✂'):
-
             await reaction.message.channel.send(on_reaction_add_rps.ulist[1].name + ' has won!')
-
-        
-
-        
-
-
 
         await asyncio.sleep(6)
-
         on_reaction_add_rps.ulist = []
-
         rlist[0] = None
-
         rlist[1] = None
 
         on_message_rps.gamestatus = False
-
         on_reaction_add_rps.check = False
-
         on_reaction_add_rps.react = False
-
         on_reaction_add_rps.timer = False
 
         return
 
         # on_reaction_add_rps.ulist[0] = None
-
         # on_reaction_add_rps.ulist[1] = None
 
 # @client.event
@@ -351,11 +227,8 @@ on_reaction_add_rps.ulist = []
 # on_reaction_add_rps.ulist.append(None)
 
 on_reaction_add_rps.check = False
-
 on_reaction_add_rps.react = False
-
 on_reaction_add_rps.timer = False
-
 on_message_rps.m = 0
 
 ##########################################################TTTTTTTTTTTTTTTTTTTTTTTTT######################
@@ -379,10 +252,10 @@ async def on_message_ttt(message): #On message
         if len(on_message_ttt.userID) < 2: #until two people type .ttt
             on_message_ttt.userID.append(message.author.name)
         if len(on_message_ttt.userID) == 2: #Once there are two people ready to play
-            if on_message_ttt.userID[0]==on_message_ttt.userID[1]: # Checks if the same person typed the message and resets conditions
-                await message.channel.send('Cannot be the same person')
-                await reset_ttt()
-                return
+            # if on_message_ttt.userID[0]==on_message_ttt.userID[1]: # Checks if the same person typed the message and resets conditions
+            #     await message.channel.send('Cannot be the same person')
+            #     await reset_ttt()
+            #     return
             on_message_ttt.gamestatus_ttt = True
             tic = discord.Embed(title="{} vs. {}".format(
                 str(on_message_ttt.userID[0])+"  :x:", str(on_message_ttt.userID[1])+"  :o:"), colour=discord.Colour.red())
@@ -562,3 +435,4 @@ async def on_reaction_add(reaction,user):
         await on_reaction_add_ttt(reaction,user)
 
 client.run(token)
+			
