@@ -236,10 +236,10 @@ on_message_rps.m = 0
 #Reset function for repeating games
 async def reset_ttt():
     on_message_ttt.repeat=True
-    on_message_ttt.won=False
+    on_reaction_add_ttt.won = False
+    on_reaction_add_ttt.count = False
     on_message_ttt.gamestatus_ttt = False
     on_reaction_add_ttt.j = 0
-    w = 0
     on_message_ttt.userID = []
 
 async def on_message_ttt(message): #On message 
@@ -260,14 +260,12 @@ async def on_message_ttt(message): #On message
             tic = discord.Embed(title="{} vs. {}".format(
                 str(on_message_ttt.userID[0])+"  :x:", str(on_message_ttt.userID[1])+"  :o:"), colour=discord.Colour.red())
             on_message_ttt.board = [":one:", ":two:", ":three:", ":four:",":five:", ":six:", ":seven:", ":eight:", ":nine:"] #emojis for game board 
+            on_message_ttt.board2 = [[":one:", ":two:", ":three:"], [":four:",":five:", ":six:"], [":seven:", ":eight:", ":nine:"]] #emojis for game board 
             on_message_ttt.emarr = [[], [], []]
 
-            b = 0 #Putting the emojis into a 3 x 3 matrix
-            while b < 9:
-                for i in range(3):
-                    for j in range(3):
-                        on_message_ttt.emarr[i].append(on_message_ttt.board[b]) 
-                        b += 1
+            for i in range(3):
+                for b in range(3):
+                    on_message_ttt.emarr[i].append(on_message_ttt.board2[i][b]) 
             # making a text board of the emojis seperated by | for the embed
             val = ""
             for i in range(3):
@@ -288,7 +286,7 @@ async def on_message_ttt(message): #On message
     await asyncio.sleep(30)            # turn off the game and reset
     if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id != message.id and on_message_ttt.moves==on_reaction_add_ttt.j:
         await reset_ttt()
-        await message.channel.send("TicTacToe game stopped due to inactivity")
+        await message.channel.send("TicTacToe game stopped due to inactivity1")
 
 #Function variables for on_message_ttt
 on_message_ttt.userID = [] 
@@ -301,11 +299,6 @@ async def on_reaction_add_ttt(reaction, user):
         return
     if user == client.user:
         return
-    # moves=on_reaction_add_ttt.j
-    # await asyncio.sleep(30)            # turn off the game and reset
-    # if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id != reaction.id and moves==on_reaction_add_ttt.j:
-    #     await reset_ttt()
-    #     await reaction.channel.send("TicTacToe game stopped due to inactivity")
     count = 0
     for i in range(2, 11):
         if reaction.emoji == client.emojis[i]: #Checks what reaction emoji was clicked
@@ -363,10 +356,11 @@ async def on_reaction_add_ttt(reaction, user):
                     if count < 3:
                         count = 0
                     else:
-                        await reaction.message.channel.send(emoji1 + " WON!")
-                        on_reaction_add_ttt.won = True
-                        await reset_ttt()
-                        return
+                        on_reaction_add_ttt.count = True
+                    #     await reaction.message.channel.send(emoji1 + " WON!")
+                    #     on_reaction_add_ttt.won = True
+                    #     await reset_ttt()
+                    #     break
                 for c in range(3): #Checks Column
                     for r in range(3):
                         if on_message_ttt.emarr[r][c] == emoji1:
@@ -374,40 +368,54 @@ async def on_reaction_add_ttt(reaction, user):
                     if count < 3:
                         count = 0
                     else:
-                        await reaction.message.channel.send(emoji1 + " WON!")
-                        on_reaction_add_ttt.won = True
-                        await reset_ttt()
-                        return
-                for r in range(3): #Checks Diagonal - upper left to bottom right
-                    if on_message_ttt.emarr[r][r] == emoji1:
+                        on_reaction_add_ttt.count = True
+                    #     await reaction.message.channel.send(emoji1 + " WON!")
+                    #     on_reaction_add_ttt.won = True
+                    #     await reset_ttt()
+                    #     break
+                for d in range(3): #Checks Diagonal - upper left to bottom right
+                    if on_message_ttt.emarr[d][d] == emoji1:
                         count += 1
                 if count < 3:
-                    count = 0
+                        count = 0
                 else:
-                    await reaction.message.channel.send(emoji1 + " WON!")
-                    on_reaction_add_ttt.won = True
-                    await reset_ttt()
-                    return
-
-                for r in range(3): #Checks Diagnoal upper right to bottom left
+                    on_reaction_add_ttt.count = True
+                #     await reaction.message.channel.send(emoji1 + " WON!")
+                #     on_reaction_add_ttt.won = True
+                #     await reset_ttt()
+                #     break
+                for b in range(3): #Checks Diagnoal upper right to bottom left
                     r2 = 2
-                    if on_message_ttt.emarr[r2-r][r2-r] == emoji1:
+                    if on_message_ttt.emarr[b][r2-b] == emoji1:
                         count += 1
                 if count < 3:
-                    count = 0
+                        count = 0
                 else:
+                    on_reaction_add_ttt.count = True
+                #     await reaction.message.channel.send(emoji1 + " WON!")
+                #     on_reaction_add_ttt.won = True
+                #     await reset_ttt()
+                #     break
+                if  on_reaction_add_ttt.count == True:
                     await reaction.message.channel.send(emoji1 + " WON!")
                     on_reaction_add_ttt.won = True
                     await reset_ttt()
-                    return
+                    break
                 if on_reaction_add_ttt.j == 9: #If no wins are found for both x and o, then it is a tie!
                     await reaction.message.channel.send("TIE!")
                     on_reaction_add_ttt.won = True
                     await reset_ttt()
-                    return
+                    break
+    moves=on_reaction_add_ttt.j
+    await asyncio.sleep(30)            # turn off the game and reset
+    if on_message_ttt.gamestatus_ttt == True and moves==on_reaction_add_ttt.j:
+        await reset_ttt()
+        await reaction.message.channel.send("TicTacToe game stopped due to inactivity2")
+    return
+
 on_reaction_add_ttt.j = 0
 on_reaction_add_ttt.won = False
-
+on_reaction_add_ttt.count = False
 
 on_message_ng.curr_msg = None
 on_message_rps.m = None
