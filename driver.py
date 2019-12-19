@@ -21,7 +21,6 @@ def reset():
     on_message_ng.curr_goal = 0        #avoids a small possibility of multiple evaluations
     on_reaction_add_ng.reaction_counter = 0
 
-
 async def on_message_ng(message):
     if message.author == client.user:   #don't check bot's msg's
         return
@@ -45,7 +44,8 @@ async def on_message_ng(message):
     await asyncio.sleep(7.5)            # turn of the game and reset variables: only for if no initial reactions
     if c == on_message_ng.curr_num and m.id == on_message_ng.curr_msg.id and on_message_ng.game_on == True:
         reset()                                                   # reset game, why it's not async explained in func
-        await message.channel.send("Number game stopped due to inactivity")
+        temp_ng=on_message_ng.curr_msg .embeds[0].insert_field_at(len(on_message_ng.curr_msg .embeds[0].fields),name=("----------------"), value="__**Number game stopped due to inactivity**__",inline=False)
+        await on_message_ng.curr_msg .edit(embed=temp_ng) #send new edited embed to same message 
 
 
 async def on_reaction_add_ng(reaction,user):
@@ -61,12 +61,21 @@ async def on_reaction_add_ng(reaction,user):
     await asyncio.sleep(1)             # increase counter by one sleep one second to wait for other entries
     if on_reaction_add_ng.reaction_counter > 1 and on_message_ng.game_on == True:  #if more than one person clicks in the ~1 second, result in a loss, and reset game
         reset()
-        await reaction.message.channel.send("You Lost.")
+        temp_ng=on_message_ng.curr_msg .embeds[0].insert_field_at(len(on_message_ng.curr_msg .embeds[0].fields),name=("----------------"), value="__**You Lost.**__",inline=False)
+        await on_message_ng.curr_msg .edit(embed=temp_ng) #send new edited embed to same message 
         return
     elif on_reaction_add_ng.reaction_counter == 1:         #only one person enetered increase curr_num by 1
         if on_message_ng.curr_num+1 == on_message_ng.curr_goal and on_message_ng.game_on == True:
+            await on_message_ng.curr_msg.clear_reactions()
+            on_message_ng.curr_num += 1
+            game_display = discord.Embed()
+            game_display.add_field(name = "Number Game", value = "Goal: "+ str(on_message_ng.curr_goal) + "\nAt: "+ str(on_message_ng.curr_num) )
+            await on_message_ng.curr_msg.edit(embed = game_display)
+            on_reaction_add_ng.reaction_counter = 0 
             reset()
-            await reaction.message.channel.send("You Won.")         #win condition if the current num gets to the goal they win, reset after
+            #win condition if the current num gets to the goal they win, reset after
+            temp_ng=on_message_ng.curr_msg .embeds[0].insert_field_at(len(on_message_ng.curr_msg .embeds[0].fields),name=("----------------"), value="__**You Won.**__",inline=False)
+            await on_message_ng.curr_msg .edit(embed=temp_ng) 
             return
         await on_message_ng.curr_msg.clear_reactions()
         on_message_ng.curr_num += 1
@@ -80,7 +89,8 @@ async def on_reaction_add_ng(reaction,user):
     await asyncio.sleep(7.5)            # turn off the game and reset
     if c == on_message_ng.curr_num and m.id == on_message_ng.curr_msg.id and on_message_ng.game_on == True:
         reset()
-        await reaction.message.channel.send("Number game stopped due to inactivity")
+        temp_ng=on_message_ng.curr_msg .embeds[0].insert_field_at(len(on_message_ng.curr_msg .embeds[0].fields),name=("----------------"), value="__**Number game stopped due to inactivity**__",inline=False)
+        await on_message_ng.curr_msg .edit(embed=temp_ng)  
 
 
 on_message_ng.game_on = False  # if game is running or not
@@ -233,7 +243,7 @@ on_message_rps.m = 0
 
 ##########################################################TTTTTTTTTTTTTTTTTTTTTTTTT######################
 
-#Reset function for repeating games
+#Reset function for repeating games. Resetting the function variables needed for a fresh game
 async def reset_ttt():
     on_message_ttt.repeat=True
     on_reaction_add_ttt.won = False
@@ -259,13 +269,12 @@ async def on_message_ttt(message): #On message
             on_message_ttt.gamestatus_ttt = True
             tic = discord.Embed(title="{} vs. {}".format(
                 str(on_message_ttt.userID[0])+"  :x:", str(on_message_ttt.userID[1])+"  :o:"), colour=discord.Colour.red())
-            on_message_ttt.board = [":one:", ":two:", ":three:", ":four:",":five:", ":six:", ":seven:", ":eight:", ":nine:"] #emojis for game board 
-            on_message_ttt.board2 = [[":one:", ":two:", ":three:"], [":four:",":five:", ":six:"], [":seven:", ":eight:", ":nine:"]] #emojis for game board 
+            on_message_ttt.board4 = [['1️⃣', '2️⃣', '3️⃣'], ['4️⃣', '5️⃣', '6️⃣'], ['7️⃣', '8️⃣', '9️⃣']] #emojis for game board 
             on_message_ttt.emarr = [[], [], []]
 
             for i in range(3):
                 for b in range(3):
-                    on_message_ttt.emarr[i].append(on_message_ttt.board2[i][b]) 
+                    on_message_ttt.emarr[i].append(on_message_ttt.board4[i][b]) 
             # making a text board of the emojis seperated by | for the embed
             val = ""
             for i in range(3):
@@ -273,24 +282,29 @@ async def on_message_ttt(message): #On message
                 for k in range(3):
                     val += on_message_ttt.emarr[i][k] + " | "
                 val += "\n \n"
-
+            
             tic.add_field(
                 name=("Your turn:  ❌ \n"),
                 value=val # The game board made above for the embed 
             )
             msg = await message.channel.send(embed=tic)
             on_message_ttt.em = msg # Used to check if we are on the correct game message
-            for i in range(2, 11):
-                await msg.add_reaction(client.emojis[i]) # Showing the reactions that are buttons to control the board
-    on_message_ttt.moves=on_reaction_add_ttt.j
-    await asyncio.sleep(30)            # turn off the game and reset
-    if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id != message.id and on_message_ttt.moves==on_reaction_add_ttt.j:
-        await reset_ttt()
-        await message.channel.send("TicTacToe game stopped due to inactivity1")
+            for i in range(3):
+                for b in range(3):
+                    await msg.add_reaction(on_message_ttt.board4[i][b]) # Showing the reactions that are buttons to control the board
+            on_message_ttt.temp_msg = on_message_ttt.em.id
+            moves=on_reaction_add_ttt.j
+            await asyncio.sleep(20)            # turn off the game and reset
+            if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id == on_message_ttt.temp_msg and moves==on_reaction_add_ttt.j:
+                await reset_ttt()
+                temp_embed=on_message_ttt.em.embeds[0].insert_field_at(len(on_message_ttt.em.embeds[0].fields),name=("----------------"), value="__**TicTacToe game stopped due to inactivity**__",inline=False)
+                await on_message_ttt.em.edit(embed=temp_embed) #send new edited embed to same message 
+
 
 #Function variables for on_message_ttt
 on_message_ttt.userID = [] 
 on_message_ttt.gamestatus_ttt = False
+on_message_ttt.temp_msg = 0
 
 async def on_reaction_add_ttt(reaction, user):
     if on_message_ttt.gamestatus_ttt == False:
@@ -299,118 +313,90 @@ async def on_reaction_add_ttt(reaction, user):
         return
     if user == client.user:
         return
-    count = 0
-    for i in range(2, 11):
-        if reaction.emoji == client.emojis[i]: #Checks what reaction emoji was clicked
-            if on_reaction_add_ttt.j % 2 == 0: #Checks what turn we are on
-                if user.name == on_message_ttt.userID[0]:  #If we are on the first user
-                    on_reaction_add_ttt.j += 1
-                    v = ":x:"
-                    t = ":o:"
-                else:
-                    return
-            else:
-                if user.name == on_message_ttt.userID[1]: #If we are on the second user
-                    on_reaction_add_ttt.j += 1
-                    v = ":o:"
-                    t = ":x:"
-
-                else:
-                    return
-            for m in range(2, 11): #Finds the loction of the corresponding reaction emoji on the numbered board and stores it in temp
-                if i == m:
-                    if (m-1) % 3 == 0: #Checks if the reaction emoji clicked is a multiple of three
-                        temp = on_message_ttt.emarr[int((m-1)/3-1)][int(m % 3+1)]
+    count = count2 = count3 = count4 = 0
+    for i in range(0,3):
+        for j in range(0, 3):
+            if reaction.emoji == on_message_ttt.board4[i][j]: #Checks what reaction emoji was clicked
+                if on_reaction_add_ttt.j % 2 == 0: #Checks what turn we are on
+                    if user.name == on_message_ttt.userID[0]:  #If we are on the first user
+                        on_reaction_add_ttt.j += 1
+                        v = ":x:"
+                        t = ":o:"
                     else:
-                        temp = on_message_ttt.emarr[int((m-1)/3)][(int(m-1) % 3)-1]
-                    if (temp not in on_message_ttt.board):
-                        on_reaction_add_ttt.j -= 1
                         return
-                    else: # Changes the desired emoji on the desired number emoji of the board with an x or o depending on the turn 
-                        if (m-1) % 3 == 0:
-                            on_message_ttt.emarr[int((m-1)/3-1)][int(m % 3+1)] = v 
+                else:
+                    if user.name == on_message_ttt.userID[1]: #If we are on the second user
+                        on_reaction_add_ttt.j += 1
+                        v = ":o:"
+                        t = ":x:"
+                    else:
+                        return
+                temp = on_message_ttt.emarr[i][j]
+                if (temp not in on_message_ttt.board4[0] and temp not in on_message_ttt.board4[1] and temp not in on_message_ttt.board4[2]):
+                    on_reaction_add_ttt.j -= 1
+                    return
+                # Changes the desired emoji on the desired number emoji of the board with an x or o depending on the turn 
+                on_message_ttt.emarr[i][j] = v
+                # Remake val with for the updated emebed board
+                val = ""
+                for l in range(3):
+                    val += " | "
+                    for k in range(3):
+                        val += on_message_ttt.emarr[l][k] + " | "
+                    val += "\n \n"
+                new = discord.Embed(title="{} vs. {}".format(
+                    str(on_message_ttt.userID[0])+"  :x:", str(on_message_ttt.userID[1])+"  :o:"), colour=discord.Colour.red())
+                new.add_field(
+                    name=("Your turn: " + t + "\n"), value=val) # Changes to next user
+                await on_message_ttt.em.edit(embed=new) #send new edited embed to same message 
+                # Checks win every time and sees if there is any pattern of three x's or o's in a line
+                for w in range(2):
+                    if w == 0: #Checks the code with x first and then o second time.
+                        emoji1 = ":x:"
+                    else:
+                        emoji1 = ":o:"
+                    for r in range(3): #Checks row
+                        for c in range(3):
+                            if on_message_ttt.emarr[r][c] == emoji1:
+                                count += 1
+                            if on_message_ttt.emarr[c][r] == emoji1:
+                                count2 +=1
+                        if ((count < 3) and (count2 <3)):
+                            count = 0
+                            count2 = 0
                         else:
-                            on_message_ttt.emarr[int((m-1)/3)][(int(m-1) % 3)-1] = v
-                        # Remake val with for the updated emebed board
-                        val = ""
-                        for l in range(3):
-                            val += " | "
-                            for k in range(3):
-                                val += on_message_ttt.emarr[l][k] + " | "
-                            val += "\n \n"
-                        new = discord.Embed(title="{} vs. {}".format(
-                            str(on_message_ttt.userID[0])+"  :x:", str(on_message_ttt.userID[1])+"  :o:"), colour=discord.Colour.red())
-                        new.add_field(
-                            name=("Your turn: " + t + "\n"), value=val) # Changes to next user
-                        await on_message_ttt.em.edit(embed=new) #send new edited embed to same message 
-            # Checks win every time and sees if there is any pattern of three x's or o's in a line
-            for w in range(2):
-                if w == 0: #Checks the code with x first and then o second time.
-                    emoji1 = ":x:"
-                else:
-                    emoji1 = ":o:"
-                for r in range(3): #Checks row
-                    for c in range(3):
-                        if on_message_ttt.emarr[r][c] == emoji1:
-                            count += 1
-                    if count < 3:
-                        count = 0
+                            on_reaction_add_ttt.count = True
+                            break
+                    for d in range(3): #Checks Diagonal - upper left to bottom right
+                        if on_message_ttt.emarr[d][d] == emoji1:
+                            count3 += 1
+                        if on_message_ttt.emarr[d][2-d] == emoji1:
+                            count4 += 1
+                    if (count3 < 3) and (count4 <3):
+                        count3 = 0
+                        count4 = 0
                     else:
+                        print(2)
                         on_reaction_add_ttt.count = True
-                    #     await reaction.message.channel.send(emoji1 + " WON!")
-                    #     on_reaction_add_ttt.won = True
-                    #     await reset_ttt()
-                    #     break
-                for c in range(3): #Checks Column
-                    for r in range(3):
-                        if on_message_ttt.emarr[r][c] == emoji1:
-                            count += 1
-                    if count < 3:
-                        count = 0
-                    else:
-                        on_reaction_add_ttt.count = True
-                    #     await reaction.message.channel.send(emoji1 + " WON!")
-                    #     on_reaction_add_ttt.won = True
-                    #     await reset_ttt()
-                    #     break
-                for d in range(3): #Checks Diagonal - upper left to bottom right
-                    if on_message_ttt.emarr[d][d] == emoji1:
-                        count += 1
-                if count < 3:
-                        count = 0
-                else:
-                    on_reaction_add_ttt.count = True
-                #     await reaction.message.channel.send(emoji1 + " WON!")
-                #     on_reaction_add_ttt.won = True
-                #     await reset_ttt()
-                #     break
-                for b in range(3): #Checks Diagnoal upper right to bottom left
-                    r2 = 2
-                    if on_message_ttt.emarr[b][r2-b] == emoji1:
-                        count += 1
-                if count < 3:
-                        count = 0
-                else:
-                    on_reaction_add_ttt.count = True
-                #     await reaction.message.channel.send(emoji1 + " WON!")
-                #     on_reaction_add_ttt.won = True
-                #     await reset_ttt()
-                #     break
-                if  on_reaction_add_ttt.count == True:
-                    await reaction.message.channel.send(emoji1 + " WON!")
-                    on_reaction_add_ttt.won = True
-                    await reset_ttt()
-                    break
-                if on_reaction_add_ttt.j == 9: #If no wins are found for both x and o, then it is a tie!
-                    await reaction.message.channel.send("TIE!")
-                    on_reaction_add_ttt.won = True
-                    await reset_ttt()
-                    break
+                    if  on_reaction_add_ttt.count == True:
+                        temp_embed=on_message_ttt.em.embeds[0].insert_field_at(len(on_message_ttt.em.embeds[0].fields),name=("----------------"), value=emoji1 + "** WON!**",inline=False)
+                        await on_message_ttt.em.edit(embed=temp_embed) #send new edited embed to same message 
+                        on_reaction_add_ttt.won = True
+                        await reset_ttt()
+                        break
+                    if on_reaction_add_ttt.j == 9: #If no wins are found for both x and o, then it is a tie!
+                        temp_embed=on_message_ttt.em.embeds[0].insert_field_at(len(on_message_ttt.em.embeds[0].fields),name=("----------------"), value=emoji1 + "** TIE!**''",inline=False)
+                        await on_message_ttt.em.edit(embed=temp_embed) #send new edited embed to same message
+                        on_reaction_add_ttt.won = True
+                        await reset_ttt()
+                        break
+    on_reaction_add_ttt.temp_react = on_message_ttt.em.id
     moves=on_reaction_add_ttt.j
-    await asyncio.sleep(30)            # turn off the game and reset
-    if on_message_ttt.gamestatus_ttt == True and moves==on_reaction_add_ttt.j:
+    await asyncio.sleep(20)            # turn off the game and reset
+    if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id == on_reaction_add_ttt.temp_react and moves==on_reaction_add_ttt.j:
         await reset_ttt()
-        await reaction.message.channel.send("TicTacToe game stopped due to inactivity2")
+        temp_embed=on_message_ttt.em.embeds[0].insert_field_at(len(on_message_ttt.em.embeds[0].fields),name=("----------------"), value="__**TicTacToe game stopped due to inactivity**__",inline=False)
+        await on_message_ttt.em.edit(embed=temp_embed) #send new edited embed to same message 
     return
 
 on_reaction_add_ttt.j = 0

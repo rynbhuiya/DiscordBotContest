@@ -69,7 +69,7 @@ async def on_message_ttt(message): #On message
             msg = await message.channel.send(embed=tic)
             on_message_ttt.em = msg # Used to check if we are on the correct game message
             for i in range(2, 11):
-                await msg.add_reaction(client.emojis[i]) # Showing the reactions that are buttons to control the board
+                await msg.add_reaction(':one:') # Showing the reactions that are buttons to control the board
     on_message_ttt.moves=on_reaction_add_ttt.j
     await asyncio.sleep(30)            # turn off the game and reset
     if on_message_ttt.gamestatus_ttt == True and on_message_ttt.em.id != message.id and on_message_ttt.moves==on_reaction_add_ttt.j:
