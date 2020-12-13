@@ -158,4 +158,5 @@ on_reaction_add.react = False
 on_reaction_add.timer = False
 on_message.m = 0
 
-client.run('NjQyOTE3ODI3MTM2OTc4OTY0.Xcd6cA.BCSLe7pTgjJcUoqT1gZ9p7H6YJc')
+load_dotenv()
+client.run(os.getenv("DISCORD_TOKEN"))
