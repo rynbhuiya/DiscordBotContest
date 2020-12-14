@@ -3,7 +3,8 @@ import discord.reaction
 import discord.embeds
 import asyncio
 from discord.ext import commands
-
+from dotenv import load_dotenv
+import os
 client = commands.Bot(command_prefix = '.') # Change the command prefix
 
 @client.event
@@ -158,5 +159,5 @@ on_reaction_add.react = False
 on_reaction_add.timer = False
 on_message.m = 0
 
-load_dotenv()
-client.run(os.getenv("DISCORD_TOKEN"))
+# load_dotenv()
+# client.run(os.getenv("DISCORD_TOKEN"))

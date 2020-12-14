@@ -38,6 +38,7 @@ async def on_message(message): #On message
             return
         if len(on_message.userID) < 2: #until two people type .ttt
             on_message.userID.append(message.author.name)
+            print(message.author.name)
         if len(on_message.userID) == 2: #Once there are two people ready to play
             # if on_message.userID[0]==on_message.userID[1]: # Checks if the same person typed the message and resets conditions
             #     await message.channel.send('Cannot be the same person')
